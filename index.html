@@ -1,1 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V5 Ultra AI OS</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<style>
+:root {
+    --bg: #080c14;
+    --bg2: #0d1220;
+    --card: #101828;
+    --card2: #0a1120;
+    --border: #1a2540;
+    --border2: #0f1e35;
+    --accent: #3b82f6;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text: #cbd5e1;
+    --muted: #3d5068;
+    --y: #d4b84a;
+    --g: #3ecf6e;
+    --y-glow: rgba(212,184,74,0.45);
+    --g-glow: rgba(62,207,110,0.5);
+    --y-dim: rgba(212,184,74,0.06);
+    --g-dim: rgba(62,207,110,0.06);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+        radial-gradient(ellipse 60% 40% at 10% 60%, rgba(59,130,246,0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 90% 10%, rgba(62,207,110,0.04) 0%, transparent 70%);
+}
+header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 28px; height: 56px;
+    background: rgba(13,18,32,0.9);
+    border-bottom: 1px solid var(--border2);
+    backdrop-filter: blur(16px);
+    position: sticky; top: 0; z-index: 200;
+}
+.logo {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 15px; letter-spacing: 4px;
+    color: var(--y); text-shadow: 0 0 12px var(--y-glow);
+}
+.logo span { color: var(--g); text-shadow: 0 0 12px var(--g-glow); }
+#userInfo { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); visibility: hidden; }
+.btn-logout {
+    background: var(--border2); border: 1px solid var(--border);
+    color: var(--muted); padding: 5px 12px; border-radius: 6px;
+    font-size: 11px; letter-spacing: 1px; cursor: pointer;
+    font-family: 'Outfit', sans-serif; transition: 0.2s;
+}
+.btn-logout:hover { color: var(--text); border-color: var(--muted); }
+
+.container {
+    max-width: 980px; margin: 0 auto; padding: 28px 24px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    visibility: hidden;
+}
+@media (max-width: 720px) { .container { grid-template-columns: 1fr; } }
+.full { grid-column: 1 / -1; }
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 16px; padding: 24px;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.4);
+    position: relative; overflow: hidden;
+}
+.card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+.card-title {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+}
+.card-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border2), transparent);
+}
+
+/* SEGMENTED DISPLAY */
+.seg-wrap {
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-radius: 14px; padding: 22px 12px 16px;
+    margin-bottom: 18px;
+    box-shadow: inset 0 2px 16px rgba(0,0,0,0.5);
+    position: relative;
+}
+.seg-wrap::after {
+    content: ''; position: absolute; inset: 0; border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.015) 0%, transparent 40%);
+    pointer-events: none;
+}
+.seg-row {
+    display: flex; justify-content: center; align-items: flex-end;
+    gap: 0; flex-wrap: wrap; row-gap: 12px;
+}
+.seg-unit {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 7px;
+}
+.seg-unit + .seg-unit { border-left: 1px solid var(--border2); }
+.seg-nums { display: flex; gap: 3px; margin-bottom: 7px; }
+.seg-d {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 40px; line-height: 1;
+    color: var(--y);
+    text-shadow: 0 0 8px var(--y-glow), 0 0 24px rgba(212,184,74,0.2);
+    position: relative; width: 29px; text-align: center;
+}
+.seg-d::before {
+    content: '8'; position: absolute; inset: 0; text-align: center;
+    color: var(--y-dim); text-shadow: none; z-index: 0;
+}
+.seg-d span { position: relative; z-index: 1; }
+.seg-d.grn {
+    color: var(--g);
+    text-shadow: 0 0 8px var(--g-glow), 0 0 24px rgba(62,207,110,0.2);
+}
+.seg-d.grn::before { color: var(--g-dim); }
+.seg-d.sm { font-size: 26px; width: 20px; }
+.seg-sep {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 26px; color: rgba(212,184,74,0.2);
+    padding: 0 2px; margin-bottom: 11px; line-height: 1;
+    animation: bsep 1s step-end infinite;
+}
+@keyframes bsep { 0%,100%{opacity:1} 50%{opacity:0.12} }
+.seg-lbl {
+    font-size: 9px; letter-spacing: 1.5px; color: var(--muted);
+    font-family: 'Outfit', sans-serif;
+}
+.ms-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 14px; padding: 0 4px;
+}
+.ms-lbl { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); min-width: 16px; }
+.ms-track { flex: 1; height: 3px; background: rgba(255,255,255,0.04); border-radius: 2px; overflow: hidden; }
+.ms-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--y), var(--g));
+    box-shadow: 0 0 8px var(--y-glow);
+    border-radius: 2px; width: 0%;
+}
+.ms-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; color: var(--g);
+    text-shadow: 0 0 8px var(--g-glow);
+    min-width: 34px; text-align: right;
+}
+
+/* LEVEL BADGE */
+.level-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, rgba(212,184,74,0.1), rgba(62,207,110,0.07));
+    border: 1px solid rgba(212,184,74,0.22);
+    border-radius: 20px; padding: 6px 18px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; letter-spacing: 2px;
+    color: var(--y); text-shadow: 0 0 8px var(--y-glow);
+    margin-bottom: 18px;
+}
+.level-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--g); box-shadow: 0 0 6px var(--g-glow);
+    animation: pdot 2s ease-in-out infinite;
+}
+@keyframes pdot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.6} }
+
+/* BUTTONS */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 20px; font-size: 12px; letter-spacing: 1.5px;
+    font-family: 'Outfit', sans-serif; font-weight: 600;
+    border: none; border-radius: 9px; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    text-transform: uppercase;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color:white; box-shadow:0 4px 16px rgba(59,130,246,0.25); }
+.btn-primary:hover { box-shadow:0 6px 20px rgba(59,130,246,0.4); }
+.btn-green { background: linear-gradient(135deg,#15803d,#22c55e); color:white; box-shadow:0 4px 16px rgba(34,197,94,0.2); }
+.btn-green:hover { box-shadow:0 6px 20px rgba(34,197,94,0.35); }
+.btn-ghost { background:var(--border2); border:1px solid var(--border); color:var(--muted); }
+.btn-ghost:hover { color:var(--text); border-color:var(--muted); }
+.btn-emergency {
+    width:100%; padding:16px; font-size:13px; letter-spacing:3px;
+    background:linear-gradient(135deg,#7f1d1d,#dc2626,#ef4444); color:white;
+    border:none; border-radius:10px; font-family:'Share Tech Mono',monospace;
+    cursor:pointer; margin-top:16px; animation:pulsered 2s infinite; transition:transform 0.15s;
+}
+.btn-emergency:hover { transform:scale(1.01); }
+@keyframes pulsered {
+    0%{box-shadow:0 0 0 0 rgba(239,68,68,0.5)}
+    70%{box-shadow:0 0 0 14px rgba(239,68,68,0)}
+    100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}
+}
+
+/* POMODORO */
+.pomo-display {
+    background:var(--card2); border:1px solid var(--border2); border-radius:12px;
+    padding:18px; margin:12px 0 16px;
+    font-family:'Share Tech Mono',monospace; font-size:52px; letter-spacing:6px;
+    color:var(--y); text-shadow:0 0 10px var(--y-glow),0 0 30px rgba(212,184,74,0.15);
+    line-height:1;
+}
+#pomoStatus { font-size:10px; letter-spacing:4px; color:var(--accent); text-transform:uppercase; font-weight:600; margin-bottom:4px; }
+.dots-row { margin-bottom:16px; }
+.dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--border); margin:0 4px; transition:0.3s; }
+.dot.on { background:var(--y); box-shadow:0 0 6px var(--y-glow); }
+
+/* INPUT */
+input[type=text], input[type=email], input[type=password] {
+    background:var(--card2); border:1px solid var(--border);
+    color:var(--text); border-radius:9px; padding:11px 14px;
+    font-size:14px; font-family:'Outfit',sans-serif;
+    outline:none; transition:border-color 0.2s; width:100%;
+}
+input:focus { border-color:var(--accent); }
+
+/* TASK */
+.task-input-row { display:flex; gap:8px; margin-bottom:14px; }
+.task-item {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:11px 14px; background:var(--card2);
+    border:1px solid var(--border2); border-radius:9px;
+    margin-bottom:8px; font-size:14px; transition:border-color 0.2s;
+}
+.task-item:hover { border-color:var(--border); }
+.task-done {
+    background:none; border:1px solid var(--border2); color:var(--muted);
+    padding:5px 12px; border-radius:6px; font-size:11px; letter-spacing:1px;
+    cursor:pointer; font-family:'Outfit',sans-serif; transition:0.2s;
+}
+.task-done:hover { border-color:var(--g); color:var(--g); background:rgba(62,207,110,0.05); }
+
+/* STATS */
+.stat-grid { display:flex; gap:12px; }
+.stat-card { flex:1; background:var(--card2); border:1px solid var(--border2); border-radius:12px; padding:16px; text-align:center; }
+.stat-num { font-family:'Share Tech Mono',monospace; font-size:36px; color:var(--y); text-shadow:0 0 10px var(--y-glow); line-height:1; margin-bottom:4px; }
+.stat-lbl { font-size:9px; letter-spacing:3px; color:var(--muted); margin-bottom:12px; }
+.stat-btn {
+    width:100%; padding:8px; font-size:11px; letter-spacing:1px;
+    background:var(--border2); border:1px solid var(--border); color:var(--muted);
+    border-radius:7px; cursor:pointer; font-family:'Outfit',sans-serif; transition:0.2s;
+}
+.stat-btn:hover { border-color:var(--y); color:var(--y); background:rgba(212,184,74,0.06); }
+
+/* QUOTE */
+#quote { font-size:16px; line-height:1.8; color:var(--muted); font-style:italic; font-weight:300; }
+
+/* MODALS */
+.modal {
+    display:none; position:fixed; inset:0;
+    background:rgba(4,6,12,0.96); z-index:500;
+    justify-content:center; align-items:center; flex-direction:column;
+    backdrop-filter:blur(12px);
+}
+.modal-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:48px 40px;
+    box-shadow:0 32px 80px rgba(0,0,0,0.6);
+    width:90%; max-width:380px;
+}
+.modal-box h2 {
+    font-family:'Share Tech Mono',monospace; font-size:18px; letter-spacing:3px;
+    color:var(--y); text-shadow:0 0 12px var(--y-glow);
+    margin-bottom:28px; text-align:center;
+}
+.auth-field { margin-bottom:12px; }
+#authError { color:var(--danger); font-size:12px; margin-top:8px; text-align:center; min-height:18px; }
+#authSwitch { color:var(--muted); font-size:12px; cursor:pointer; text-align:center; margin-top:14px; letter-spacing:1px; transition:color 0.2s; }
+#authSwitch:hover { color:var(--accent); }
+#authModal { display:flex; }
+.breathe-circle {
+    width:160px; height:160px; border-radius:50%; background:var(--success);
+    display:flex; justify-content:center; align-items:center;
+    font-family:'Share Tech Mono',monospace; font-size:16px; font-weight:bold;
+    transition:all 4s ease-in-out; margin:24px auto;
+    box-shadow:0 0 40px rgba(34,197,94,0.4); color:white;
+}
+</style>
+</head>
+<body>
+
+<div class="modal" id="authModal">
+    <div class="modal-box">
+        <h2 id="authTitle">V5 · LOGIN</h2>
+        <div class="auth-field"><input type="email" id="authEmail" placeholder="Email address"></div>
+        <div class="auth-field"><input type="password" id="authPassword" placeholder="Password"></div>
+        <button class="btn btn-primary" id="authBtn" onclick="handleAuth()" style="width:100%;margin-top:8px;">LOGIN</button>
+        <p id="authError"></p>
+        <p id="authSwitch" onclick="switchAuthMode()">Need an account? Sign Up</p>
+    </div>
+</div>
+
+<div class="modal" id="emergencyModal">
+    <h1 style="font-family:'Share Tech Mono';color:var(--danger);letter-spacing:4px;font-size:22px;margin-bottom:8px;">STOP. WAIT 5 MINUTES.</h1>
+    <p style="color:var(--muted);max-width:480px;line-height:1.7;font-size:14px;padding:0 20px;text-align:center;">The urge is a chemical storm. It WILL pass. Focus on the circle — nothing else.</p>
+    <div class="breathe-circle" id="breatheCircle">Breathe In</div>
+    <button class="btn btn-green" onclick="closeEmergency()" style="padding:14px 40px;font-size:13px;">✓ I Survived</button>
+</div>
+
+<header>
+    <div class="logo">V5 <span>ULTRA</span> OS</div>
+    <div id="userInfo">
+        <span id="userEmailDisplay"></span>
+        <button class="btn-logout" onclick="logout()">LOGOUT</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+
+    <div class="card full">
+        <div class="card-title">⬡ Smoke Free Tracker</div>
+        <div style="text-align:center;">
+            <div class="level-badge">
+                <div class="level-dot"></div>
+                <span id="rewardText">LEVEL: NOVICE</span>
+            </div>
+        </div>
+        <div class="seg-wrap">
+            <div class="seg-row">
+                <div class="seg-unit">
+                    <div class="seg-nums">
+                        <div class="seg-d"><span id="y0">0</span></div>
+                        <div class="seg-d"><span id="y1">0</span></div>
+                    </div>
+                    <div class="seg-lbl">বছর</div>
+                </div>
+                <div class="seg-sep">:</div>
+                <div class="seg-unit">
+                    <div class="seg-nums">
+                        <div class="seg-d"><span id="mo0">0</span></div>
+                        <div class="seg-d"><span id="mo1">0</span></div>
+                    </div>
+                    <div class="seg-lbl">মাস</div>
+                </div>
+                <div class="seg-sep">:</div>
+                <div class="seg-unit">
+                    <div class="seg-nums">
+                        <div class="seg-d"><span id="d0">0</span></div>
+                        <div class="seg-d"><span id="d1">0</span></div>
+                    </div>
+                    <div class="seg-lbl">দিন</div>
+                </div>
+                <div class="seg-sep">:</div>
+                <div class="seg-unit">
+                    <div class="seg-nums">
+                        <div class="seg-d"><span id="h0">0</span></div>
+                        <div class="seg-d"><span id="h1">0</span></div>
+                    </div>
+                    <div class="seg-lbl">ঘন্টা</div>
+                </div>
+                <div class="seg-sep">:</div>
+                <div class="seg-unit">
+                    <div class="seg-nums">
+                        <div class="seg-d"><span id="m0">0</span></div>
+                        <div class="seg-d"><span id="m1">0</span></div>
+                    </div>
+                    <div class="seg-lbl">মিনিট</div>
+                </div>
+                <div class="seg-sep">:</div>
+                <div class="seg-unit">
+                    <div class="seg-nums">
+                        <div class="seg-d"><span id="s0">0</span></div>
+                        <div class="seg-d"><span id="s1">0</span></div>
+                    </div>
+                    <div class="seg-lbl">সেকেন্ড</div>
+                </div>
+                <div class="seg-sep" style="color:rgba(62,207,110,0.18);font-size:20px;margin-bottom:14px;">·</div>
+                <div class="seg-unit">
+                    <div class="seg-nums">
+                        <div class="seg-d grn sm"><span id="ms0">0</span></div>
+                        <div class="seg-d grn sm"><span id="ms1">0</span></div>
+                        <div class="seg-d grn sm"><span id="ms2">0</span></div>
+                    </div>
+                    <div class="seg-lbl">মিলিসেকেন্ড</div>
+                </div>
+            </div>
+            <div class="ms-row">
+                <span class="ms-lbl">MS</span>
+                <div class="ms-track"><div class="ms-fill" id="msBar"></div></div>
+                <span class="ms-val" id="msVal">000</span>
+            </div>
+        </div>
+        <div style="text-align:center;">
+            <button class="btn btn-green" onclick="startJourney()">▶ Start / Reset Journey</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🧠 Pomodoro Focus Hub</div>
+        <p style="font-size:12px;color:var(--muted);letter-spacing:1px;margin-bottom:12px;">25min FOCUS · 5min BREAK · 4 ROUNDS</p>
+        <div id="pomoStatus">READY</div>
+        <div class="pomo-display" id="pomoTimerDisplay">25:00</div>
+        <div class="dots-row" id="roundDots"></div>
+        <button class="btn btn-primary" id="pomoStartBtn" onclick="togglePomodoro()">Start Focus</button>
+        <button class="btn btn-ghost" onclick="resetPomodoro()" style="margin-left:6px;">Reset</button>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🔥 Emergency Protocol</div>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7;">
+            The craving is a chemical storm in your brain.<br>
+            It <strong style="color:var(--text);">WILL</strong> pass in 3–5 minutes. Click below.
+        </p>
+        <button class="btn-emergency" onclick="openEmergency()">⚡ I NEED TO SMOKE</button>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📋 Daily Routine Planner</div>
+        <div class="task-input-row">
+            <input type="text" id="taskInput" placeholder="Add a routine...">
+            <button class="btn btn-primary" onclick="addTask()" style="padding:10px 16px;white-space:nowrap;width:auto;">+ Add</button>
+        </div>
+        <div id="taskList"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">⚡ Dopamine Logs</div>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-num" id="exerciseNum">0</div>
+                <div class="stat-lbl">WORKOUTS</div>
+                <button class="stat-btn" onclick="logStat('workouts')">💪 Log Workout</button>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="studyNum">0</div>
+                <div class="stat-lbl">SESSIONS</div>
+                <button class="stat-btn" onclick="logStat('studies')">📚 Log Study</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card full">
+        <div class="card-title">✦ Motivation Engine</div>
+        <p id="quote"></p>
+    </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAxvlgFelSDpmzA5HRCjUoBb8AQkymCvt8",
+    authDomain: "planning-with-ai-55055.firebaseapp.com",
+    projectId: "planning-with-ai-55055",
+    storageBucket: "planning-with-ai-55055.firebasestorage.app",
+    messagingSenderId: "814662668043",
+    appId: "1:814662668043:web:4cd60dafd237b3797c5c0e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null, isSigningUp = false;
+let quitStartTime = null, rafId = null;
+
+const authModal = document.getElementById('authModal');
+const mainCont  = document.getElementById('mainContainer');
+const userInfo  = document.getElementById('userInfo');
+const authError = document.getElementById('authError');
+
+onAuthStateChanged(auth, user => {
+    if (user) { currentUser = user; showMain(); initData(); }
+    else       { currentUser = null; showAuth(); }
+});
+
+window.switchAuthMode = () => {
+    isSigningUp = !isSigningUp;
+    document.getElementById('authTitle').innerText   = isSigningUp ? "V5 · SIGN UP" : "V5 · LOGIN";
+    document.getElementById('authBtn').innerText     = isSigningUp ? "SIGN UP" : "LOGIN";
+    document.getElementById('authSwitch').innerText  = isSigningUp ? "Have an account? Login" : "Need an account? Sign Up";
+    authError.innerText = "";
+};
+
+window.handleAuth = async () => {
+    const email = document.getElementById('authEmail').value;
+    const pass  = document.getElementById('authPassword').value;
+    authError.innerText = "Processing...";
+    try {
+        if (isSigningUp) {
+            const c = await createUserWithEmailAndPassword(auth, email, pass);
+            await setDoc(doc(db,"users",c.user.uid), { workouts:0, studies:0, routines:[], pomoSessionsCompleted:0 });
+        } else {
+            await signInWithEmailAndPassword(auth, email, pass);
+        }
+    } catch(e) { authError.innerText = e.message; }
+};
+
+window.logout = () => signOut(auth);
+
+function showMain() {
+    authModal.style.display = "none";
+    mainCont.style.visibility = "visible";
+    userInfo.style.visibility = "visible";
+    document.getElementById('userEmailDisplay').innerText = currentUser.email;
+}
+function showAuth() {
+    authModal.style.display = "flex";
+    mainCont.style.visibility = "hidden";
+    userInfo.style.visibility = "hidden";
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    resetPomodoro();
+}
+
+function initData() {
+    if (!currentUser) return;
+    onSnapshot(doc(db,"users",currentUser.uid), snap => {
+        if (!snap.exists()) return;
+        const d = snap.data();
+        document.getElementById('exerciseNum').innerText = d.workouts || 0;
+        document.getElementById('studyNum').innerText    = d.studies  || 0;
+        renderTasks(d.routines || []);
+    });
+    onSnapshot(doc(db,`users/${currentUser.uid}/journey`,"timer"), snap => {
+        if (snap.exists()) { quitStartTime = snap.data().start; startRaf(); }
+        else               { quitStartTime = null; clearSeg(); }
+    });
+}
+
+function boom(n=100) { confetti({ particleCount:n, spread:70, origin:{y:0.6}, zIndex:9999 }); }
+
+window.startJourney = async () => {
+    if (!currentUser) return;
+    if (confirm("Start/reset your Smoke Free Journey?")) {
+        await setDoc(doc(db,`users/${currentUser.uid}/journey`,"timer"), { start: Date.now() });
+        boom(200);
+    }
+};
+
+// ── REAL requestAnimationFrame MILLISECONDS ──
+function pad2(n) { return String(n).padStart(2,'0'); }
+function pad3(n) { return String(n).padStart(3,'0'); }
+
+function startRaf() {
+    if (rafId) cancelAnimationFrame(rafId);
+    function loop() {
+        updateSeg();
+        rafId = requestAnimationFrame(loop);
+    }
+    rafId = requestAnimationFrame(loop);
+}
+
+function clearSeg() {
+    ['y0','y1','mo0','mo1','d0','d1','h0','h1','m0','m1','s0','s1','ms0','ms1','ms2']
+        .forEach(id => { const el = document.getElementById(id); if(el) el.innerText = '0'; });
+    document.getElementById('msBar').style.width = '0%';
+    document.getElementById('msVal').innerText = '000';
+}
+
+function updateSeg() {
+    if (!quitStartTime) return;
+    const diff = Date.now() - quitStartTime;
+    const ms = diff % 1000;
+    const totalSec = Math.floor(diff / 1000);
+
+    let rem = totalSec;
+    const years  = Math.floor(rem / (365.25*24*3600)); rem -= Math.floor(years*365.25*24*3600);
+    const months = Math.floor(rem / (30.44*24*3600));  rem -= Math.floor(months*30.44*24*3600);
+    const days   = Math.floor(rem / (24*3600));         rem -= days*24*3600;
+    const hours  = Math.floor(rem / 3600);              rem -= hours*3600;
+    const mins   = Math.floor(rem / 60);
+    const secs   = rem % 60;
+
+    const set2 = (a,b,v) => {
+        const s = pad2(v);
+        document.getElementById(a).innerText = s[0];
+        document.getElementById(b).innerText = s[1];
+    };
+    set2('y0','y1',years);
+    set2('mo0','mo1',months);
+    set2('d0','d1',days);
+    set2('h0','h1',hours);
+    set2('m0','m1',mins);
+    set2('s0','s1',secs);
+
+    // Real 3-digit milliseconds
+    const msStr = pad3(ms);
+    document.getElementById('ms0').innerText = msStr[0];
+    document.getElementById('ms1').innerText = msStr[1];
+    document.getElementById('ms2').innerText = msStr[2];
+    document.getElementById('msBar').style.width = (ms / 10).toFixed(1) + '%';
+    document.getElementById('msVal').innerText = msStr;
+
+    // Reward level
+    const totalDays = Math.floor(diff / 86400000);
+    let lvl = "NOVICE";
+    if (totalDays > 3)  lvl = "STRONG MIND";
+    if (totalDays > 7)  lvl = "DISCIPLINE BUILDER";
+    if (totalDays > 30) lvl = "DOPAMINE MASTER";
+    if (totalDays > 90) lvl = "HABIT MASTER (V5)";
+    document.getElementById('rewardText').innerText = `LEVEL: ${lvl}`;
+}
+
+// ── POMODORO ──
+const FOCUS=25*60, BREAK=5*60, MAX=4;
+let pTime=FOCUS, pInt=null, pRun=false, pMode='focus', pRounds=0;
+const pStatus=document.getElementById('pomoStatus');
+const pDisp=document.getElementById('pomoTimerDisplay');
+const pBtn=document.getElementById('pomoStartBtn');
+const pDots=document.getElementById('roundDots');
+
+window.togglePomodoro = () => pRun ? pausePomo() : startPomo();
+
+function startPomo() {
+    if (!currentUser) return;
+    pRun=true; pBtn.innerText="Pause";
+    pStatus.innerText = pMode==='focus'?"DEEP FOCUS":"SHORT BREAK";
+    pStatus.style.color = pMode==='focus'?"var(--accent)":"var(--success)";
+    pInt = setInterval(async () => {
+        pTime--; updatePomoDisp();
+        if (pTime <= 0) {
+            clearInterval(pInt); pRun=false;
+            if (pMode==='focus') {
+                pRounds++; renderDots(); boom(80);
+                await updateDoc(doc(db,"users",currentUser.uid), { pomoSessionsCompleted:increment(1), studies:increment(1) });
+                if (pRounds>=MAX) {
+                    pMode='focus'; pTime=FOCUS; pRounds=0;
+                    pStatus.innerText="CYCLE COMPLETE!"; pStatus.style.color="var(--warning)";
+                    pBtn.innerText="Restart Cycle"; boom(260); setTimeout(renderDots,800);
+                } else {
+                    pMode='break'; pTime=BREAK;
+                    pStatus.innerText="BREAK TIME"; pStatus.style.color="var(--success)";
+                    pBtn.innerText="Start Break";
+                }
+            } else {
+                pMode='focus'; pTime=FOCUS;
+                pStatus.innerText="READY FOR FOCUS"; pStatus.style.color="var(--accent)";
+                pBtn.innerText="Start Focus";
+            }
+            updatePomoDisp();
+        }
+    },1000);
+}
+
+function pausePomo() {
+    pRun=false; clearInterval(pInt);
+    pBtn.innerText="Resume"; pStatus.innerText="PAUSED"; pStatus.style.color="var(--muted)";
+}
+
+window.resetPomodoro = () => {
+    clearInterval(pInt); pRun=false; pMode='focus'; pTime=FOCUS; pRounds=0;
+    pBtn.innerText="Start Focus"; pStatus.innerText="READY"; pStatus.style.color="var(--muted)";
+    updatePomoDisp(); renderDots();
+};
+
+function updatePomoDisp() { pDisp.innerText=`${pad2(Math.floor(pTime/60))}:${pad2(pTime%60)}`; }
+function renderDots() {
+    pDots.innerHTML='';
+    for(let i=0;i<MAX;i++){
+        const d=document.createElement('span');
+        d.className=i<pRounds?'dot on':'dot'; pDots.appendChild(d);
+    }
+}
+renderDots(); updatePomoDisp();
+
+// ── TASKS ──
+function renderTasks(list) {
+    const el=document.getElementById('taskList'); el.innerHTML='';
+    list.forEach(t=>{
+        const d=document.createElement('div'); d.className='task-item';
+        d.innerHTML=`<span>${t}</span><button class="task-done" onclick="completeTask('${t.replace(/'/g,"\\'")}')">✓ Done</button>`;
+        el.appendChild(d);
+    });
+}
+window.addTask = async () => {
+    const inp=document.getElementById('taskInput'); const txt=inp.value.trim();
+    if(!txt||!currentUser) return;
+    await updateDoc(doc(db,"users",currentUser.uid),{routines:arrayUnion(txt)}); inp.value='';
+};
+window.completeTask = async t => {
+    if(!currentUser) return;
+    await updateDoc(doc(db,"users",currentUser.uid),{routines:arrayRemove(t)}); boom(50);
+};
+
+// ── STATS ──
+window.logStat = async type => {
+    if(!currentUser) return;
+    await updateDoc(doc(db,"users",currentUser.uid),{[type]:increment(1)}); boom(70);
+};
+
+// ── QUOTES ──
+const qs=[
+    "Every hour smoke-free rewires your brain.",
+    "Discipline today, absolute freedom tomorrow.",
+    "Your lungs are healing right now. Don't stop.",
+    "Small wins compound into a great life.",
+    "A craving only lasts 3 minutes. You can survive 3 minutes.",
+    "The version of you that doesn't smoke is waiting. Keep going."
+];
+const qEl=document.getElementById('quote');
+function showQ() { qEl.innerText=`"${qs[Math.floor(Math.random()*qs.length)]}"`; }
+showQ(); setInterval(showQ,15000);
+
+// ── EMERGENCY ──
+let bInt;
+window.openEmergency = () => {
+    if(pRun) pausePomo();
+    document.getElementById('emergencyModal').style.display='flex';
+    const c=document.getElementById('breatheCircle'); let inn=true;
+    bInt=setInterval(()=>{
+        if(inn){c.style.transform="scale(1.8)";c.style.background="var(--accent)";c.style.boxShadow="0 0 60px rgba(59,130,246,0.5)";c.innerText="Hold...";}
+        else{c.style.transform="scale(1)";c.style.background="var(--success)";c.style.boxShadow="0 0 40px rgba(34,197,94,0.4)";c.innerText="Exhale...";}
+        inn=!inn; setTimeout(()=>{if(inn)c.innerText="Breathe In";},2000);
+    },4000);
+};
+window.closeEmergency = () => {
+    document.getElementById('emergencyModal').style.display='none';
+    clearInterval(bInt); boom(180);
+};
+</script>
+</body>
+</html>
