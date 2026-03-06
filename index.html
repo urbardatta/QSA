@@ -987,61 +987,61 @@ body::after{
 </div>
 
 <!-- ══════════ ONBOARDING ══════════ -->
-<div id="screen-onboard" class="screen">
-<div class="ob-wrap">
-  <div class="ob-logo">
-    <div class="ob-logo-mark">🌿</div>
-    <div class="ob-logo-text">NIRVAAN</div>
+<!-- SETUP MODAL — shown once on first login, replaces onboarding -->
+<div class="modal-overlay" id="setup-modal" style="z-index:2000;">
+  <div class="modal" style="max-height:95vh;">
+    <div class="modal-top-line"></div>
+    <div style="text-align:center;margin-bottom:18px;">
+      <div style="width:52px;height:52px;background:var(--grad-fire);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;box-shadow:0 0 28px rgba(255,107,0,0.5);">🌿</div>
+      <div class="modal-title" style="margin-bottom:4px;">WELCOME TO NIRVAAN</div>
+      <div style="font-size:0.72rem;color:var(--muted);">Set up your quit journey — takes 30 seconds</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-lbl">Your Name</label>
+      <input type="text" class="modal-input" id="inp-name" placeholder="Enter your name...">
+    </div>
+    <div class="modal-field">
+      <label class="modal-lbl">When did you smoke your last cigarette?</label>
+      <input type="datetime-local" class="modal-input" id="inp-quit">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="modal-field">
+        <label class="modal-lbl">Cigarettes / day</label>
+        <select class="modal-input" id="inp-cpd">
+          <option value="5">1–5</option><option value="10" selected>6–10</option>
+          <option value="15">11–15</option><option value="20">15–20</option><option value="25">20+</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-lbl">Price / cig (BDT)</label>
+        <input type="number" class="modal-input" id="inp-price" value="12" min="1">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="modal-field">
+        <label class="modal-lbl">I am a...</label>
+        <select class="modal-input" id="inp-type">
+          <option value="student">Student</option>
+          <option value="coder">Developer</option>
+          <option value="ielts">IELTS Candidate</option>
+          <option value="professional">Professional</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-lbl">Quit reason</label>
+        <select class="modal-input" id="inp-reason">
+          <option>Health</option><option>Family</option>
+          <option>Save money</option><option>Career</option><option>Prove myself</option>
+        </select>
+      </div>
+    </div>
+    <!-- hidden legacy fields for compatibility -->
+    <input type="hidden" id="inp-years" value="5">
+    <div class="modal-btns" style="margin-top:4px;">
+      <button class="btn-modal-save" style="width:100%;" onclick="launchApp()">🚀 Start My Journey!</button>
+    </div>
   </div>
-  <div class="ob-headline">Your<br><span>Freedom</span><br>Journey</div>
-  <p class="ob-sub">Every second your body is healing. Start now.</p>
-  <div class="ob-progress">
-    <div class="ob-dot active" id="od0"></div>
-    <div class="ob-dot" id="od1"></div>
-    <div class="ob-dot" id="od2"></div>
-  </div>
-  <div class="ob-step active" id="ob-step-0">
-    <div class="ob-step-label">Step 1 — Who Are You</div>
-    <div class="ob-field"><label class="ob-label">Your name</label>
-      <input type="text" id="inp-name" class="ob-input" placeholder="Enter your name..."></div>
-    <div class="ob-field"><label class="ob-label">When did you smoke your last cigarette?</label>
-      <input type="datetime-local" id="inp-quit" class="ob-input"></div>
-    <button class="btn-next" onclick="obNext(0)">Next Step →</button>
-  </div>
-  <div class="ob-step" id="ob-step-1">
-    <div class="ob-step-label">Step 2 — Smoking Info</div>
-    <div class="ob-field"><label class="ob-label">How many cigarettes per day?</label>
-      <select id="inp-cpd" class="ob-input">
-        <option value="5">1–5</option><option value="10" selected>6–10</option>
-        <option value="15">11–15</option><option value="20">15–20</option><option value="25">20+</option>
-      </select></div>
-    <div class="ob-field"><label class="ob-label">Price per cigarette (BDT)</label>
-      <input type="number" id="inp-price" class="ob-input" value="12" placeholder="12"></div>
-    <div class="ob-field"><label class="ob-label">How long were you smoking?</label>
-      <select id="inp-years" class="ob-input">
-        <option value="1">Less than 1 year</option><option value="3">1–3 years</option>
-        <option value="5" selected>3–5 years</option><option value="10">5–10 years</option><option value="15">10+ years</option>
-      </select></div>
-    <button class="btn-back" onclick="obBack(1)">← Back</button>
-    <button class="btn-next" style="width:auto;padding:14px 30px;" onclick="obNext(1)">Next →</button>
-  </div>
-  <div class="ob-step" id="ob-step-2">
-    <div class="ob-step-label">Step 3 — Your Goal</div>
-    <div class="ob-field"><label class="ob-label">Main reason to quit?</label>
-      <select id="inp-reason" class="ob-input">
-        <option>Health</option><option>Family</option><option>Save money</option>
-        <option>Career</option><option>Prove myself</option>
-      </select></div>
-    <div class="ob-field"><label class="ob-label">Who are you? (for routine customization)</label>
-      <select id="inp-type" class="ob-input">
-        <option value="student">Student</option><option value="coder">Developer/Coder</option>
-        <option value="ielts">IELTS Candidate</option><option value="professional">Professional</option>
-        <option value="other">Other</option>
-      </select></div>
-    <button class="btn-back" onclick="obBack(2)">← Back</button>
-    <button class="btn-next" style="width:auto;padding:14px 30px;" onclick="launchApp()">🚀 Start Journey!</button>
-  </div>
-</div>
 </div>
 
 <!-- ══════════ MAIN APP ══════════ -->
@@ -1422,17 +1422,26 @@ function showScreen(name){
 }
 
 /* ══ AUTH STATE ══ */
-window.onload=function(){
-  const gl=document.getElementById('g-loading');
-  if(gl) gl.classList.add('show');
+function setDefaultQuitTime(){
   const n=getBD();n.setSeconds(0);n.setMilliseconds(0);
   const qi=document.getElementById('inp-quit');
   if(qi){
-    // Format as local datetime string for the input (BD time)
     const yr=n.getFullYear(),mo=pad2(n.getMonth()+1),dy=pad2(n.getDate());
     const hh=pad2(n.getHours()),mm=pad2(n.getMinutes());
     qi.value=`${yr}-${mo}-${dy}T${hh}:${mm}`;
   }
+}
+function openSetupModal(){
+  setDefaultQuitTime();
+  document.getElementById('setup-modal').classList.add('show');
+}
+function closeSetupModal(){
+  document.getElementById('setup-modal').classList.remove('show');
+}
+
+window.onload=function(){
+  const gl=document.getElementById('g-loading');
+  if(gl) gl.classList.add('show');
   auth.onAuthStateChanged(user=>{
     if(gl) gl.classList.remove('show');
     if(user){currentUser=user;updateUserUI(user);loadUserData(user.uid);}
@@ -1465,12 +1474,17 @@ async function loadUserData(uid){
       }
       setSyncStatus('online');
       initApp();
-    }else{setSyncStatus('online');showScreen('onboard');}
+    }else{
+      setSyncStatus('online');
+      // No data yet — show app + setup modal
+      initApp();
+      openSetupModal();
+    }
   }catch(e){
     console.error(e);setSyncStatus('offline');
     const saved=localStorage.getItem('nirvaan_v4');
     if(saved){U=JSON.parse(saved);if(U.quitTime)U.quitTime=Number(U.quitTime);initApp();}
-    else showScreen('onboard');
+    else{initApp();openSetupModal();}
   }
 }
 let _saveTimer=null;
@@ -1641,43 +1655,36 @@ const ROUTINES={
   default:{'🌅 Morning':[{t:'6:30',n:'Wake up & drink water',pts:5},{t:'7:00',n:'Exercise',pts:20},{t:'7:45',n:'Breakfast & get ready',pts:10},{t:'8:30',n:'Plan your day',pts:10}],'☀️ Afternoon':[{t:'12:30',n:'Healthy lunch',pts:10},{t:'1:30',n:'Walk for 10 minutes',pts:15},{t:'3:00',n:'Drink water',pts:5},{t:'4:30',n:'Skill development',pts:20}],'🌙 Evening':[{t:'7:30',n:'Light dinner',pts:10},{t:'9:00',n:'Book or podcast',pts:15},{t:'10:00',n:'Write in journal',pts:10},{t:'11:00',n:'Prepare for sleep',pts:5}]},
 };
 
-/* ══ ONBOARDING ══ */
-function obNext(step){
-  if(step===0){
-    if(!document.getElementById('inp-name').value.trim()){alert('Enter your name!');return;}
-    if(!document.getElementById('inp-quit').value){alert('Enter quit time!');return;}
-  }
-  document.getElementById('ob-step-'+step).classList.remove('active');
-  document.getElementById('ob-step-'+(step+1)).classList.add('active');
-  document.getElementById('od'+step).classList.remove('active');
-  document.getElementById('od'+(step+1)).classList.add('active');
-}
-function obBack(step){
-  document.getElementById('ob-step-'+step).classList.remove('active');
-  document.getElementById('ob-step-'+(step-1)).classList.add('active');
-}
+/* ══ SETUP ══ */
 async function launchApp(){
-  const displayName=currentUser?.displayName||document.getElementById('inp-name').value.trim();
-  // datetime-local value treated as BD time (UTC+6)
-  const rawVal=document.getElementById('inp-quit').value;
+  const nameEl=document.getElementById('inp-name');
+  const quitEl=document.getElementById('inp-quit');
+  const displayName=(currentUser?.displayName||nameEl?.value||'').trim()||currentUser?.email?.split('@')[0]||'Friend';
+  if(!quitEl?.value){showToast('⚠️ Please set your quit time!');return;}
+  const rawVal=quitEl.value;
   const bdDate=new Date(rawVal);
   const localOffset=bdDate.getTimezoneOffset();
-  const bdOffset=-360; // BD = UTC+6
-  const quitTime=bdDate.getTime()+(localOffset-bdOffset)*60000;
+  const quitTime=bdDate.getTime()+(localOffset+360)*60000; // convert to UTC, treating input as BD (UTC+6)
   U={
     name:displayName,uid:currentUser?.uid||null,email:currentUser?.email||null,
     quitTime,
-    cpd:parseInt(document.getElementById('inp-cpd').value),
-    price:parseFloat(document.getElementById('inp-price').value)||12,
-    years:parseInt(document.getElementById('inp-years').value),
-    reason:document.getElementById('inp-reason').value,
-    type:document.getElementById('inp-type').value,
+    cpd:parseInt(document.getElementById('inp-cpd')?.value||'10'),
+    price:parseFloat(document.getElementById('inp-price')?.value||'12')||12,
+    years:parseInt(document.getElementById('inp-years')?.value||'5'),
+    reason:document.getElementById('inp-reason')?.value||'Health',
+    type:document.getElementById('inp-type')?.value||'student',
     points:0,badges:[],cravingsWon:0,routineDone:{},habitsDone:{},
     journals:[],challengeDone:{},createdAt:Date.now(),
   };
-  localStorage.setItem('nirvaan_v4',JSON.stringify(U));
-  if(currentUser){setSyncStatus('sync');try{await getUserDoc(currentUser.uid).set(U);setSyncStatus('online');}catch(e){setSyncStatus('offline');}}
-  initApp();
+  saveU();
+  closeSetupModal();
+  // Rebuild all with new data
+  buildMilestones();buildHealthItems();buildRoutine();buildHabits();buildWeekGrid();
+  buildJournal();buildDistractions();buildMoods();buildChallenges();buildBadges();
+  buildBuyList();buildProgDashboard();
+  buildFocusSubjects();buildFocusCalendar();buildSummaryTable();buildAnalyzer();buildTodos();
+  startMainTimers();
+  showToast('🚀 Journey started! You got this!');
 }
 
 /* ══ INIT APP ══ */
